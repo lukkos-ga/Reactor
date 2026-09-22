@@ -1,0 +1,27 @@
+# Secrets / local configuration
+config.json
+.env
+.env.*
+!.env.example
+
+# Runtime data
+reports/
+recipes/
+.browser-profile/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# OS / editors
+.DS_Store
+__MACOSX/
+.idea/
+.vscode/
+
+# Logs / temporary files
+*.log
+*.tmp

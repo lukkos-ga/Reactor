@@ -1,0 +1,28 @@
+{
+  "reporter_email": "you+abuse@example.com",
+  "reporter_name": "A concerned internet user",
+  "urlscan_key": "",
+  "vt_key": "",
+  "smtp_host": "",
+  "smtp_port": "587",
+  "smtp_user": "",
+  "smtp_pass": "",
+  "gsb_key": "",
+  "monitor": "off",
+  "monitor_minutes": "15",
+  "monitor_touch": "off",
+  "clipboard": "off",
+  "notify": "on",
+  "ct": "off",
+  "ct_minutes": "60",
+  "country": "",
+  "ct_keywords": "telegram, whatsapp",
+  "identities": [
+    {
+      "email": "you+abuse@example.com",
+      "name": "A concerned internet user",
+      "gmail_index": ""
+    }
+  ],
+  "active": 0
+}

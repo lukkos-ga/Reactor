@@ -1,0 +1,970 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>fuckscammer</title>
+<style>
+:root{--bg:#0e1116;--card:#161b22;--line:#2a313c;--fg:#e6edf3;--dim:#8b949e;
+      --red:#f85149;--grn:#3fb950;--amb:#d29922;--acc:#58a6ff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:14px}
+h1{margin:0;font-size:19px;letter-spacing:-.3px}
+.sub{color:var(--dim);font-size:12px}
+nav{display:flex;gap:4px;padding:0 24px;border-bottom:1px solid var(--line);
+  position:sticky;top:0;background:var(--bg);z-index:10}
+nav button{background:none;border:0;border-bottom:2px solid transparent;color:var(--dim);
+  padding:11px 14px;cursor:pointer;font-size:13px;font-weight:500}
+nav button.on{color:var(--fg);border-bottom-color:var(--acc)}
+main{padding:22px 24px;max-width:1080px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:16px 18px;margin-bottom:16px}
+.card h2{margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:.7px;color:var(--dim)}
+label{display:block;font-size:12px;color:var(--dim);margin:10px 0 4px}
+input[type=text],input[type=email],input[type=password],textarea,select{
+  width:100%;background:#0d1117;border:1px solid var(--line);border-radius:6px;
+  color:var(--fg);padding:9px 11px;font:inherit}
+input:focus,textarea:focus{outline:0;border-color:var(--acc)}
+textarea{min-height:64px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+button.go{background:var(--red);color:#fff;border:0;border-radius:7px;padding:12px 22px;
+  font-size:14px;font-weight:600;cursor:pointer}
+button.go:disabled{opacity:.45;cursor:not-allowed}
+button.ghost{background:none;border:1px solid var(--line);color:var(--fg);border-radius:6px;
+  padding:8px 14px;cursor:pointer;font-size:12px}
+.sites{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:6px}
+.sites label{display:flex;gap:8px;align-items:flex-start;margin:0;padding:7px 9px;
+  border:1px solid var(--line);border-radius:6px;color:var(--fg);font-size:12.5px;cursor:pointer}
+.sites label:hover{border-color:var(--acc)}
+.sites .k{font-size:10px;color:var(--dim);text-transform:uppercase}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;color:var(--dim);font-weight:500;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:7px 8px;border-bottom:1px solid #1d232c;vertical-align:top}
+code{background:#0d1117;padding:1px 5px;border-radius:4px;font-size:12px}
+.ok{color:var(--grn)}.bad{color:var(--red)}.warn{color:var(--amb)}
+.kv{display:grid;grid-template-columns:130px 1fr;gap:4px 12px;font-size:12.5px}
+.kv b{color:var(--dim);font-weight:500}
+.banner{border-left:3px solid var(--amb);background:#1c1a12;padding:11px 14px;
+  border-radius:0 6px 6px 0;font-size:12.5px;margin-bottom:16px}
+.hide{display:none}
+.paste{width:100%;min-height:120px;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}
+.target{border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:8px;
+  background:#0d1117;display:flex;gap:12px;align-items:flex-start}
+.target.dupe{opacity:.55}
+.target h3{margin:0 0 4px;font-size:14px;font-weight:600;word-break:break-all}
+.pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;
+  border:1px solid var(--line);color:var(--dim);margin-right:5px}
+.pill.b{border-color:var(--acc);color:var(--acc)}
+.pill.w{border-color:var(--amb);color:var(--amb)}
+.lures{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.step{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--dim);
+  border-top:1px solid var(--line);padding-top:14px;margin:22px 0 10px}
+kbd{background:#0d1117;border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-size:11px}
+a{color:var(--acc)}
+details summary{cursor:pointer;color:var(--dim);font-size:12px;margin-bottom:8px}
+.note{color:var(--dim);font-size:11.5px}
+</style>
+
+<header>
+  <h1>fuckscammer</h1>
+  <span class="sub">one URL in, every abuse desk notified</span>
+  <span class="sub" id="freshness" style="margin-left:auto"></span>
+</header>
+<nav>
+  <button class="on" data-tab="report">Report</button>
+  <button data-tab="settings">Settings</button>
+  <button data-tab="history">History</button>
+</nav>
+
+<main>
+<div class="banner">
+  This tool never opens the phishing site. Neither should you. The browser it drives
+  runs in a throwaway profile with none of your logins. Nothing is submitted until you press Submit all,
+  and forms guarded by a CAPTCHA can only ever be submitted by you, by hand.
+</div>
+
+<!-- ------------------------------------------------------------- REPORT -->
+<section id="tab-report">
+  <div class="card" id="livecard">
+    <h2>Live status</h2>
+    <div id="livebox" class="note">loading…</div>
+    <div style="margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <label style="display:flex;gap:6px;align-items:center;margin:0">
+        <input type="checkbox" id="mon_on" onchange="saveMonitor()"> keep checking automatically</label>
+      <label style="display:flex;gap:6px;align-items:center;margin:0">every
+        <input type="text" id="mon_min" value="15" style="width:52px" onchange="saveMonitor()"> min</label>
+      <label style="display:flex;gap:6px;align-items:center;margin:0" title="Fetches the page from your IP">
+        <input type="checkbox" id="mon_touch" onchange="saveMonitor()"> include a page fetch</label>
+      <span id="mon_note" class="note"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Reporting as</h2>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <select id="who" style="max-width:360px" onchange="switchIdentity(this.value)"></select>
+      <span id="whonote" class="note"></span>
+    </div>
+  </div>
+
+  <div id="clipchip"></div>
+  <div id="ctchip"></div>
+
+  <div class="card">
+    <h2>Watch for the next one</h2>
+    <p class="note">Every TLS certificate is published to public logs minutes after it is
+      issued. A lookalike domain shows up there while it is still being set up — before
+      the SMS reaches you. Nothing here contacts those domains.</p>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <label style="display:flex;gap:6px;align-items:center;margin:0">
+        <input type="checkbox" id="ct_on" onchange="saveCT()"> watch certificate logs</label>
+      <label style="display:flex;gap:6px;align-items:center;margin:0">every
+        <input type="text" id="ct_min" value="60" style="width:52px" onchange="saveCT()"> min</label>
+      <label style="display:flex;gap:6px;align-items:center;margin:0">brands
+        <input type="text" id="ct_kw" style="width:230px" onchange="saveCT()"
+          placeholder="telegram, whatsapp"></label>
+      <button class="ghost" onclick="scanCT()">Scan now</button>
+      <span id="ct_note" class="note"></span>
+    </div>
+    <div id="ct_hits" style="margin-top:12px"></div>
+  </div>
+
+  <div class="step">Step 1 — paste the scam message</div>
+  <div class="card">
+    <h2>Paste what you received</h2>
+    <p class="note">Whole SMS or chat message. It pulls out the links — including
+      <code>hxxps</code>, <code>[.]</code> and <code>(dot)</code> tricks — works out which brand is
+      being spoofed from the wording, and skips anything you already reported.
+      <kbd>⌘</kbd>+<kbd>Enter</kbd> to scan.</p>
+    <textarea id="msg" class="paste" placeholder="Telegram Security Alert: a new device logged into your account. Verify within 24 hours or your account will be suspended: hxxps://tg-verify[.]icu/auth"></textarea>
+    <div style="margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="go" id="btn-scan">Find the links</button>
+      <label style="display:flex;gap:6px;align-items:center;margin:0" title="Only known shorteners are ever fetched">
+        <input type="checkbox" id="expand" checked> expand shortened links</label>
+      <label style="display:flex;gap:6px;align-items:center;margin:0"
+        title="Reads your clipboard while on. Only URLs are kept.">
+        <input type="checkbox" id="clipon" onchange="setClipboard(this.checked)"> watch my clipboard</label>
+      <label style="display:flex;gap:6px;align-items:center;margin:0">
+        <input type="checkbox" id="notify_on" onchange="saveCT()"> desktop notifications</label>
+      <button class="ghost" onclick="fetch('/api/notify-test',{method:'POST',body:'{}'})">Test</button>
+      <span id="scanmsg" class="note"></span>
+    </div>
+    <div id="targets" style="margin-top:14px"></div>
+  </div>
+
+  <div class="step">Step 2 — or just paste one URL</div>
+  <div class="card">
+    <h2>Single target</h2>
+    <label>Phishing URL</label>
+    <input id="url" type="text" placeholder="https://www.example.top/" autocomplete="off" spellcheck="false">
+    <div class="row">
+      <div>
+        <label>Impersonated brand (optional — CCs their abuse desk)</label>
+        <select id="brand"><option value="">— none / unknown —</option></select>
+      </div>
+      <div>
+        <label>Extra detail for the report forms (optional)</label>
+        <input id="comment" type="text" placeholder="auto-generated from recon if blank">
+      </div>
+    </div>
+  </div>
+
+  <div class="step">Step 3 — where it goes</div>
+  <div class="card">
+    <h2>Where to send it</h2>
+    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="do_apis" checked> Blocklist APIs (Netcraft, urlscan, VirusTotal, PhishStats)</label>
+    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="do_emails" checked> Email complaints (registrar, host, brand, APWG)</label>
+    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="do_browser" checked> Open the vendor report forms in tabs</label>
+    <details style="margin-top:12px">
+      <summary>Choose vendor sites (<span id="sitecount">16</span> selected)</summary>
+      <div style="margin-bottom:8px">
+        <button class="ghost" onclick="allSites(true)">All</button>
+        <button class="ghost" onclick="allSites(false)">None</button>
+      </div>
+      <div class="sites" id="sites"></div>
+    </details>
+  </div>
+
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:22px">
+    <button class="ghost" id="btn-preview">Preview — recon only, send nothing</button>
+    <button class="go" id="btn-go">Report everywhere</button>
+    <span id="status" class="note"></span>
+  </div>
+
+  <div id="out"></div>
+</section>
+
+<!-- ----------------------------------------------------------- SETTINGS -->
+<section id="tab-settings" class="hide">
+  <div class="card">
+    <h2>What is wired up</h2>
+    <div id="wiring">loading…</div>
+  </div>
+
+  <div class="card">
+    <h2>Where you are</h2>
+    <p class="note">Adds your country's CERT, regulator and police channels. The CERT can
+      lean on a host and registrar in ways an individual reporter cannot.</p>
+    <label>Country</label>
+    <select id="c_country" onchange="saveCountry()" style="max-width:280px"></select>
+    <div id="chanlist" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Your reporting accounts</h2>
+    <p class="note">Add every address you report from and switch between them on the Report
+      tab. The chosen one is used for the vendor forms, the <code>From:</code> on the
+      complaint drafts, and the Gmail compose link.</p>
+    <p class="note">The Gmail link picks the account by <b>address</b>
+      (<code>authuser=</code>), so it works without you knowing any slot number. Leave
+      <b>Gmail slot</b> blank unless you have a reason to pin the <code>/u/N/</code> path —
+      a slot that does not exist in your browser makes Gmail fall back to
+      <code>/u/0/</code> and send from the wrong account.</p>
+    <div style="margin:6px 0 12px">
+      <button class="ghost" onclick="detectSlots()">Detect slots from Gmail</button>
+      <span id="detmsg" class="note"></span>
+    </div>
+    <div id="idlist"></div>
+    <div class="row" style="margin-top:12px">
+      <div><label>Add address</label><input id="new_email" type="email" placeholder="you+abuse@gmail.com"></div>
+      <div><label>Display name</label><input id="new_name" type="text" placeholder="A concerned internet user"></div>
+      <div><label>Gmail slot (optional)</label><input id="new_gi" type="text" placeholder="auto"></div>
+      <div style="display:flex;align-items:flex-end"><button class="ghost" onclick="addIdentity()">Add account</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>API keys — optional, both free</h2>
+    <div class="row">
+      <div><label>urlscan.io key</label><input id="c_urlscan_key" type="password" autocomplete="off"></div>
+      <div><label>VirusTotal key</label><input id="c_vt_key" type="password" autocomplete="off"></div>
+      <div><label>Google Safe Browsing key</label><input id="c_gsb_key" type="password" autocomplete="off"></div>
+    </div>
+    <p class="note">Blank just means those two get skipped. Stored in config.json, chmod 600.</p>
+  </div>
+  <div class="card">
+    <h2>SMTP — optional, sends the complaint emails for real</h2>
+    <p class="note">Leave blank and you get .eml files instead; open them in Mail and hit send.
+      Gmail needs an app password, not your account password.</p>
+    <div class="row">
+      <div><label>Host</label><input id="c_smtp_host" type="text" placeholder="smtp.gmail.com"></div>
+      <div><label>Port</label><input id="c_smtp_port" type="text" placeholder="587"></div>
+      <div><label>User</label><input id="c_smtp_user" type="text" autocomplete="off"></div>
+      <div><label>App password</label><input id="c_smtp_pass" type="password" autocomplete="off"></div>
+    </div>
+  </div>
+  <button class="ghost" id="btn-save">Save settings</button>
+  <span id="savemsg" class="note"></span>
+</section>
+
+<!-- ------------------------------------------------------------ HISTORY -->
+<section id="tab-history" class="hide">
+  <div class="card">
+    <h2>Pages you have reported</h2>
+    <p class="note">One case file per target, kept in <code>reports/&lt;host&gt;/case.json</code>.
+      Timestamped proof of what went where — this is what ICANN wants 24h after the
+      registrar ignores you.</p>
+    <div id="runs">loading…</div>
+  </div>
+  <div class="card">
+    <h2>Campaigns</h2>
+    <p class="note">Pages that look like the same operator. Shared Cloudflare is ignored —
+      almost every phishing site is behind it, so it proves nothing.</p>
+    <div id="campaigns">loading…</div>
+  </div>
+
+  <div class="card">
+    <h2>What it has learned</h2>
+    <p class="note">Clicks and menu choices recorded from your own sessions, replayed on the
+      next run. Your typed text is stored as tokens, never raw. Passwords are never recorded.</p>
+    <div id="recipes">loading…</div>
+  </div>
+</section>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const CFG_KEYS = ['urlscan_key','vt_key','gsb_key','smtp_host','smtp_port','smtp_user','smtp_pass'];
+let IDS = [], ACTIVE = 0;
+let SITES = [];
+
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  ['report','settings','history'].forEach(t =>
+    $('#tab-' + t).classList.toggle('hide', t !== b.dataset.tab));
+  if (b.dataset.tab === 'history') { loadRuns(); loadRecipes(); loadCampaigns(); }
+  if (b.dataset.tab === 'settings') loadWiring();
+});
+
+const BUILD = "__BUILD__";
+
+async function boot() {
+  const d = await (await fetch('/api/bootstrap', {cache: 'no-store'})).json();
+  if (d.build && BUILD !== "__BUILD__" && d.build !== BUILD) {
+    // the server has a newer page than the one this tab loaded
+    location.reload(true);
+    return;
+  }
+  SITES = d.sites;
+  CFG_KEYS.forEach(k => { if ($('#c_' + k)) $('#c_' + k).value = d.config[k] || ''; });
+  renderIdentities(d.config);
+  renderCountry(d);
+  $('#sites').innerHTML = SITES.map(s => `
+    <label><input type="checkbox" class="site" value="${s.id}" ${s.skip ? '' : 'checked'}>
+      <span>${esc(s.name)}<br><span class="k">${s.skip ? 'unavailable' : s.kind}</span></span></label>`).join('');
+  document.querySelectorAll('.site').forEach(c => c.onchange = countSites);
+  const brands = ['telegram','whatsapp','binance','coinbase','paypal','apple','microsoft',
+                  'amazon','google','netflix','facebook','instagram','meta'];
+  $('#brand').innerHTML += brands.map(b => `<option value="${b}">${b}</option>`).join('');
+}
+const STATE_LABEL = {suspended:['ok','SUSPENDED by registrar'],
+  offline:['warn','offline — still registered'], down:['ok','taken down'],
+  blocked:['ok','blocked / warned'], 'live-flagged':['warn','live, flagged'],
+  live:['bad','live, unflagged'], unknown:['note','unknown']};
+
+async function liveTick() {
+  try {
+    const d = await (await fetch('/api/monitor-status')).json();
+    $('#mon_on').checked = d.on;
+    $('#mon_touch').checked = d.touch;
+    if (document.activeElement !== $('#mon_min')) $('#mon_min').value = d.minutes;
+    const age = d.cases.length && d.cases[0].takedown && d.cases[0].takedown.checked
+      ? Math.round((Date.now() - new Date(d.cases[0].takedown.checked)) / 1000) : null;
+    $('#freshness').innerHTML = age === null ? ''
+      : `live · data ${age < 90 ? 'just now' : Math.round(age/60) + ' min old'}`;
+    $('#mon_note').textContent = d.checking ? `checking ${d.checking}…`
+      : d.last_sweep ? `last sweep ${new Date(d.last_sweep).toLocaleTimeString()}`
+      : (d.on ? 'first sweep due' : 'off — press Check status in History for a one-off');
+    $('#livebox').innerHTML = d.cases.length ? `<table>
+      <tr><th>Page</th><th>State</th><th>Why</th><th>Last checked</th></tr>` +
+      d.cases.map(c => {
+        const t = c.takedown || {};
+        const lab = STATE_LABEL[t.state] || STATE_LABEL.unknown;
+        return `<tr><td><code>${esc(c.url || c.host)}</code></td>
+          <td class="${lab[0]}">${lab[1]}</td>
+          <td class="note">${esc(t.why || t.note || '—')}</td>
+          <td class="note">${t.checked ? esc(new Date(t.checked).toLocaleTimeString()) : 'never'}</td></tr>`;
+      }).join('') + `</table>` : '<span class="note">Nothing reported yet.</span>';
+  } catch (e) { $('#livebox').innerHTML = '<span class="note">server not reachable</span>'; }
+  setTimeout(liveTick, 10000);
+}
+
+async function saveMonitor() {
+  const r = await fetch('/api/monitor', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({monitor: $('#mon_on').checked ? 'on' : 'off',
+      monitor_minutes: $('#mon_min').value,
+      monitor_touch: $('#mon_touch').checked ? 'on' : 'off'})});
+  await r.json();
+  $('#mon_note').textContent = 'saved';
+}
+
+async function loadWiring() {
+  const d = await (await fetch('/api/wiring', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'})).json();
+  $('#wiring').innerHTML = `<table><tr><th></th><th>Piece</th><th>Unlocks</th><th>How to get it</th></tr>` +
+    d.items.map(i => `<tr>
+      <td class="${i.ok?'ok':'warn'}">${i.ok ? 'ready' : 'missing'}</td>
+      <td>${esc(i.name)}</td><td class="note">${esc(i.unlocks)}</td>
+      <td class="note">${esc(i.how)}</td></tr>`).join('') + `</table>`;
+}
+
+let COUNTRIES = [];
+
+function renderCountry(d) {
+  COUNTRIES = d.countries || [];
+  const cur = (d.config && d.config.country) || '';
+  $('#c_country').innerHTML = `<option value="">— not set —</option>` +
+    COUNTRIES.map(([code, name]) =>
+      `<option value="${esc(code)}" ${code === cur ? 'selected' : ''}>${esc(name)}</option>`).join('');
+  const KIND = {email: 'emailed automatically', form: 'web form — you fill it',
+                hotline: 'phone — you call'};
+  $('#chanlist').innerHTML = (d.channels && d.channels.length)
+    ? `<table><tr><th>Channel</th><th>How</th><th>When</th><th>Why</th></tr>` +
+      d.channels.map(c => `<tr>
+        <td><b>${esc(c.org)}</b><br>${c.kind === 'form'
+          ? `<a href="${esc(c.target)}" target="_blank" rel="noopener noreferrer">${esc(c.target)}</a>`
+          : `<code>${esc(c.target)}</code>`}
+          <div class="note">checked: ${esc(c.verified)}</div></td>
+        <td class="note">${esc(KIND[c.kind] || c.kind)}</td>
+        <td class="${c.when.startsWith('ONLY') ? 'warn' : 'note'}">${esc(c.when)}</td>
+        <td class="note">${esc(c.note)}</td></tr>`).join('') + `</table>`
+    : '<p class="note">No country selected, so no local channels are added.</p>';
+}
+
+async function saveCountry() {
+  await fetch('/api/config', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({country: $('#c_country').value})});
+  const d = await (await fetch('/api/bootstrap', {cache:'no-store'})).json();
+  renderCountry(d); loadWiring();
+}
+
+function renderIdentities(cfg) {
+  IDS = cfg.identities || []; ACTIVE = cfg.active || 0;
+  $('#who').innerHTML = IDS.map((i, n) =>
+    `<option value="${n}" ${n === ACTIVE ? 'selected' : ''}>${esc(i.email)}${i.gmail_index === '' ? '' : ` — pinned /u/${i.gmail_index}/`}</option>`).join('');
+  const smtpUser = cfg.smtp_user || '';
+  $('#whonote').innerHTML = (smtpUser && smtpUser !== cfg.reporter_email)
+    ? `<span class="warn">SMTP is configured as ${esc(smtpUser)} — it will not match this From address. Use the compose links instead.</span>`
+    : 'Used for the vendor forms, the draft From: line, and the Gmail compose link.';
+  const list = $('#idlist');
+  if (list) list.innerHTML = `<table><tr><th>Address</th><th>Name</th><th>Gmail slot</th><th>Active</th><th></th></tr>` +
+    IDS.map((i, n) => `<tr>
+      <td><code>${esc(i.email)}</code></td><td class="note">${esc(i.name)}</td>
+      <td><input type="text" value="${i.gmail_index === '' ? '' : i.gmail_index}" placeholder="auto"
+            style="width:66px" onchange="setSlot(${n}, this.value)">
+          ${i.gmail_index === '' ? '<span class="ok note"> by address</span>'
+                                 : '<span class="warn note"> pinned</span>'}</td>
+      <td>${n === ACTIVE ? '<span class="ok">in use</span>' : `<button class="ghost" onclick="switchIdentity(${n})">Use</button>`}</td>
+      <td>${IDS.length > 1 ? `<button class="ghost" onclick="removeIdentity(${n})">Remove</button>` : ''}</td>
+    </tr>`).join('') + `</table>`;
+}
+
+async function detectSlots() {
+  const msg = $('#detmsg');
+  const r = await fetch('/api/detect-slots', {method:'POST', body:'{}'});
+  const d0 = await r.json();
+  if (d0.error) { msg.innerHTML = `<span class="bad">${esc(d0.error)}</span>`; return; }
+  msg.innerHTML = 'a browser window is opening — sign in to your Google accounts there if asked';
+  const tick = async () => {
+    const d = await (await fetch('/api/detect-status')).json();
+    if (d.error) { msg.innerHTML = `<span class="bad">${esc(d.error)}</span>`; return; }
+    msg.textContent = d.status || '';
+    if (d.running) { setTimeout(tick, 1500); return; }
+    renderIdentities(d.config);
+    msg.innerHTML = d.result.length
+      ? `<span class="ok">${d.result.map(x => `/u/${x.index}/ = ${esc(x.email)}`).join(' · ')}</span>
+         <span class="note">— wrong? just type over the number</span>`
+      : `<span class="warn">${esc(d.status)}</span>`;
+  };
+  setTimeout(tick, 1500);
+}
+
+async function pushIdentities(active) {
+  const r = await fetch('/api/config', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({identities: IDS, active: active === undefined ? ACTIVE : active})});
+  renderIdentities((await r.json()).config);
+}
+async function switchIdentity(n) { await pushIdentities(parseInt(n, 10)); }
+async function setSlot(n, v) {
+  IDS[n].gmail_index = /^\d+$/.test(v.trim()) ? parseInt(v, 10) : '';
+  await pushIdentities();
+}
+async function removeIdentity(n) {
+  if (!confirm('Remove ' + IDS[n].email + '?')) return;
+  IDS.splice(n, 1);
+  await pushIdentities(Math.min(ACTIVE, IDS.length - 1));
+}
+async function addIdentity() {
+  const email = $('#new_email').value.trim();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { alert('Enter a valid email address'); return; }
+  IDS.push({email, name: $('#new_name').value.trim() || 'A concerned internet user',
+            gmail_index: /^\d+$/.test($('#new_gi').value.trim()) ? parseInt($('#new_gi').value, 10) : ''});
+  $('#new_email').value = $('#new_name').value = $('#new_gi').value = '';
+  await pushIdentities(IDS.length - 1);
+}
+
+function allSites(v){ document.querySelectorAll('.site').forEach(c => c.checked = v); countSites(); }
+function countSites(){ $('#sitecount').textContent = document.querySelectorAll('.site:checked').length; }
+
+function cfgFromForm(){ const o = {}; CFG_KEYS.forEach(k => { if ($('#c_'+k)) o[k] = $('#c_'+k).value; }); return o; }
+
+$('#btn-save').onclick = async () => {
+  await fetch('/api/config', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(cfgFromForm())});
+  $('#savemsg').textContent = 'saved ' + new Date().toLocaleTimeString();
+  const r = await (await fetch('/api/bootstrap')).json();
+  renderIdentities(r.config);
+  loadWiring();
+};
+
+let TARGETS = [];
+
+$('#btn-scan').onclick = scanMessage;
+$('#msg').addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') scanMessage();
+});
+
+async function scanMessage() {
+  const text = $('#msg').value.trim();
+  if (!text) { alert('Paste the message first'); return; }
+  $('#scanmsg').textContent = 'reading…';
+  const d = await (await fetch('/api/intake', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({text, expand: $('#expand').checked})})).json();
+  TARGETS = d.targets;
+  $('#scanmsg').textContent = d.summary;
+  const lures = (d.lures || []).map(l => `<span class="pill w">${esc(l)}</span>`).join('');
+  if (!TARGETS.length) {
+    $('#targets').innerHTML = `<p class="note">No links found. Paste the raw message —
+      forwarding sometimes strips them.</p>${lures ? '<div class="lures">' + lures + '</div>' : ''}`;
+    return;
+  }
+  $('#targets').innerHTML = (lures ? `<div class="lures" style="margin-bottom:12px">${lures}</div>` : '') +
+    TARGETS.map((t, i) => `<div class="target ${t.already_reported ? 'dupe' : ''}">
+      <input type="checkbox" class="tgt" value="${i}" ${t.already_reported ? '' : 'checked'} style="margin-top:3px">
+      <div style="flex:1">
+        <h3>${esc(t.url)}</h3>
+        <div>
+          ${t.brand ? `<span class="pill b">${esc(t.brand)}</span>` : '<span class="pill">brand unknown</span>'}
+          <span class="pill">${esc(t.domain)}</span>
+          ${t.already_reported ? '<span class="pill w">already reported</span>' : ''}
+          ${t.original ? `<span class="pill">was ${esc(t.original)}</span>` : ''}
+        </div>
+        ${t.note ? `<div class="note" style="margin-top:6px">${esc(t.note)}</div>` : ''}
+      </div>
+      <button class="ghost" onclick="useTarget(${i})">Use as single target</button>
+    </div>`).join('') +
+    `<div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="go" onclick="reportChecked()">Report all checked</button>
+      <span class="note">Blocklist APIs + complaint drafts for each. Vendor forms are one page at a time — use “Use as single target”.</span>
+    </div>
+    <div id="batchout"></div>`;
+}
+
+function useTarget(i) {
+  const t = TARGETS[i];
+  $('#url').value = t.url;
+  $('#brand').value = t.brand || '';
+  $('#url').scrollIntoView({behavior:'smooth', block:'center'});
+  $('#url').focus();
+}
+
+async function reportChecked() {
+  const picks = [...document.querySelectorAll('.tgt:checked')].map(c => TARGETS[+c.value]);
+  if (!picks.length) { alert('Nothing checked'); return; }
+  if (!confirm(`Send real abuse reports about ${picks.length} link(s)?\n\n` +
+      picks.map(p => p.url).join('\n') + '\n\nReports are permanent.')) return;
+  const box = $('#batchout');
+  box.innerHTML = '<p class="note">reporting…</p>';
+  const d = await (await fetch('/api/report-batch', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({targets: picks.map(p => ({url: p.url, brand: p.brand}))})})).json();
+  box.innerHTML = `<div class="card" style="background:#0d1117;margin-top:12px">
+    <h2>Batch result</h2>
+    <table><tr><th>Link</th><th>Registrar</th><th>Blocklists</th><th>Drafts</th></tr>` +
+    d.results.map(r => r.error
+      ? `<tr><td><code>${esc(r.url)}</code></td><td colspan="3" class="bad">${esc(r.error)}</td></tr>`
+      : `<tr><td><code>${esc(r.host)}</code>${r.cloudflare ? ' <span class="pill w">Cloudflare</span>' : ''}</td>
+           <td class="note">${esc(r.registrar || '—')}</td>
+           <td class="note">${esc(r.apis.filter(a=>a.status==='OK').map(a=>a.name).join(', ') || 'none')}</td>
+           <td class="note">${r.emails.length} written</td></tr>`).join('') +
+    `</table><p class="note">Open the drafts from the History tab, or scan a single target
+      above to drive the vendor forms.</p></div>`;
+  liveTick();
+}
+
+async function go(submit) {
+  const url = $('#url').value.trim();
+  if (!/^https?:\/\//i.test(url)) { alert('URL must start with http:// or https://'); return; }
+  if (submit && !confirm('This sends real abuse reports about:\n\n' + url +
+      '\n\nReports are permanent and go to third parties. Continue?')) return;
+  $('#btn-go').disabled = $('#btn-preview').disabled = true;
+  $('#status').textContent = submit ? 'reporting…' : 'looking it up…';
+  try {
+    const r = await fetch('/api/report', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        url, submit, brand: $('#brand').value, comment: $('#comment').value,
+        do_apis: $('#do_apis').checked, do_emails: $('#do_emails').checked,
+        do_browser: $('#do_browser').checked, config: cfgFromForm(),
+        site_ids: [...document.querySelectorAll('.site:checked')].map(c => c.value)})});
+    const d = await r.json();
+    if (d.error) { $('#out').innerHTML = `<div class="card bad">${esc(d.error)}</div>`; }
+    else { render(d); if (d.browser && d.browser.started) pollBrowser(); }
+    $('#status').textContent = submit ? 'done' : 'preview only — nothing sent';
+  } catch (e) { $('#status').textContent = 'error: ' + e; }
+  $('#btn-go').disabled = $('#btn-preview').disabled = false;
+}
+$('#btn-go').onclick = () => go(true);
+$('#btn-preview').onclick = () => go(false);
+
+function render(d) {
+  const i = d.recon, fresh = i.created && i.created.slice(0,4) >= '2024';
+  let h = `<div class="card"><h2>Recon</h2><div class="kv">
+    <b>Domain</b><span><code>${esc(i.domain)}</code></span>
+    <b>Registered</b><span>${esc(i.created||'unknown')} ${fresh?'<span class="warn">— brand new, strong phishing signal</span>':''}</span>
+    <b>Registrar</b><span>${esc(i.registrar||'unknown')}</span>
+    <b>IPs</b><span>${esc((i.ips||[]).join(', '))}</span>
+    <b>Nameservers</b><span>${esc((i.ns||[]).join(', '))}</span>
+    <b>Network</b><span>${esc(i.network||'unknown')}${i.cloudflare?' <span class="warn">(Cloudflare fronts it — report to Cloudflare first, they reach the real host)</span>':''}</span>
+    <b>Abuse contacts</b><span>${esc([...(i.registrar_abuse||[]),...(i.ip_abuse||[])].join(', ')||'none published')}</span>
+  </div></div>`;
+
+  if (d.apis.length) h += `<div class="card"><h2>Blocklist APIs</h2><table>
+    <tr><th>Service</th><th>Result</th><th>Response</th></tr>` + d.apis.map(a =>
+    `<tr><td>${esc(a.name)}</td><td class="${a.status==='OK'?'ok':a.status==='SKIP'?'warn':'bad'}">${esc(a.status)}</td>
+     <td class="note">${esc((a.detail||'').slice(0,180))}</td></tr>`).join('') + `</table></div>`;
+
+  if (d.emails.length) h += `<div class="card"><h2>Email complaints</h2>
+    <p class="note">This tool sends nothing. Each link opens a prefilled draft in your own
+      mail app — you read it and press Send there.</p>
+    <button class="ghost" onclick='openAllGmail(${JSON.stringify(d.emails.map(e=>e.gmail))})'>
+      Open all ${d.emails.length} in Gmail</button>
+    <button class="ghost" onclick='openAllMail(${JSON.stringify(d.emails.map(e=>e.mailto))})'>
+      Open all ${d.emails.length} in my mail app</button>
+    <table><tr><th>To</th><th>Who</th><th>Compose in</th><th>Saved copy</th></tr>` + d.emails.map(e =>
+    `<tr><td><code>${esc(e.to)}</code></td><td>${esc(e.label)}</td>
+     <td><a href="${esc(e.mailto)}">Mail app</a> · <a href="${esc(e.gmail)}" target="_blank" rel="noopener noreferrer">Gmail</a></td>
+     <td class="note">${esc(e.file)}</td></tr>`).join('') + `</table></div>`;
+
+  h += `<div id="browserbox"></div>`;
+  h += `<div class="card"><h2>Human-only forms</h2><table>` + d.manual.map(m =>
+    `<tr><td>${esc(m[0])}</td><td><a href="${esc(m[1])}" target="_blank" rel="noopener noreferrer">open</a></td></tr>`
+    ).join('') + `</table></div>`;
+  $('#out').innerHTML = h;
+}
+
+async function pollBrowser() {
+  const box = $('#browserbox');
+  const tick = async () => {
+    const d = await (await fetch('/api/browser-status')).json();
+    const rows = d.tabs.map(t => {
+      const cls = t.submitted ? 'ok' : t.status.startsWith('FAILED') ? 'bad'
+                : t.captcha ? 'warn' : 'ok';
+      const gate = t.verified ? '<span class="ok">confirmed</span>'
+                 : t.submitted ? '<span class="warn">verify it</span>'
+                 : t.captcha ? '<span class="warn">CAPTCHA — you</span>'
+                 : t.can_autosubmit ? '<span class="ok">auto</span>'
+                 : '<span class="warn">manual</span>';
+      const learned = t.learned ? `<span class="ok">learned ${t.learned}</span>`
+                    : t.recipe_steps ? `<span class="note">knows ${t.recipe_steps}</span>` : '';
+      return `<tr><td>${esc(t.name)}</td><td>${gate}</td>
+        <td class="${cls}">${esc(t.status)}${t.stage > 1 ? ` <span class="note">(stage ${t.stage})</span>` : ''}</td>
+        <td class="note">${esc((t.picked||[]).join('; ')) || '—'}</td>
+        <td>${learned}</td>
+        <td class="${(t.flags||[]).length ? 'warn' : 'note'}">${esc((t.flags||[]).join('; ')) || '—'}</td>
+        <td class="note">${esc(t.note)}</td></tr>`;
+    }).join('');
+    box.innerHTML = `<div class="card">
+      <h2>Vendor tabs ${d.open ? '— open' : '— closed'}</h2>
+      <p class="note">Glance down the list. <b>Submit all</b> presses Submit on every
+        CAPTCHA-free tab. The CAPTCHA ones are yours — solve and submit them in the browser,
+        and whatever you click there is learned for next time.</p>
+      <table><tr><th>Site</th><th>Gate</th><th>State</th><th>Choices made</th>
+        <th>Learned</th><th>Check these</th><th>What you still do</th></tr>${rows}</table>
+      ${d.open ? `<br><button class="go" onclick="submitAll()">Submit all (${d.ready} ready)</button>
+        <button class="ghost" onclick="closeBrowser()">Done — close browser</button>` : ''}
+    </div>`;
+    if (d.open) setTimeout(tick, 1500);
+  };
+  tick();
+}
+async function submitAll() {
+  if (!confirm('Press Submit on every CAPTCHA-free tab now?\n\nThese are real abuse reports and cannot be recalled.')) return;
+  await fetch('/api/submit-all', {method:'POST', body:'{}'});
+}
+function openAllGmail(links) {
+  links.forEach((u, i) => setTimeout(() => window.open(u, '_blank', 'noopener'), i * 400));
+}
+async function openAllMail(links) {
+  await fetch('/api/open-mail', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({links})});
+}
+async function closeBrowser(){ await fetch('/api/close-browser', {method:'POST', body:'{}'}); }
+
+async function saveCT() {
+  await fetch('/api/ct-set', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ct: $('#ct_on').checked ? 'on' : 'off',
+      ct_minutes: $('#ct_min').value, ct_keywords: $('#ct_kw').value,
+      notify: $('#notify_on').checked ? 'on' : 'off'})});
+  ctTick(); loadWiring();
+}
+
+async function scanCT() {
+  $('#ct_note').textContent = 'querying certificate logs… (crt.sh can take a minute)';
+  const d = await (await fetch('/api/ct-scan', {method:'POST', body:'{}'})).json();
+  renderCT(d.hits, d);
+  $('#ct_note').textContent = `${d.new.length} new`;
+}
+
+function renderCT(hits, meta) {
+  const errs = Object.entries(meta.errors || {});
+  const searched = (meta.searched || []).join(', ');
+  const head = [
+    meta.last_scan ? `<span class="note">last scan ${esc(new Date(meta.last_scan).toLocaleString())}</span>` : '',
+    searched ? `<span class="note"> · searched ${esc(searched)}</span>` : '',
+    errs.length ? `<div class="warn" style="margin-top:6px">couldn't search:
+      ${errs.map(([k, v]) => `${esc(k)} — ${esc(v)}`).join('; ')}. That is a failed lookup,
+      not a clean result.</div>` : ''
+  ].join('');
+  $('#ct_hits').innerHTML = head + (hits && hits.length ? `<table style="margin-top:8px">
+    <tr><th>Score</th><th>Lookalike</th><th>Brand</th><th>Why</th><th></th></tr>` +
+    hits.map(h => `<tr>
+      <td class="${h.score >= 6 ? 'bad' : 'warn'}">${h.score}</td>
+      <td><code>${esc(h.domain)}</code></td>
+      <td>${esc(h.brand)}</td>
+      <td class="note">${esc((h.why || []).join('; '))}</td>
+      <td><button class="ghost" onclick="useCT('${esc(h.url)}','${esc(h.brand)}')">Report</button>
+          <button class="ghost" onclick="dropCT('${esc(h.domain)}')">Not phishing</button></td>
+    </tr>`).join('') + `</table>`
+    : '<p class="note" style="margin-top:8px">Nothing above the bar. Scoring is strict on purpose — a bare brand keyword scores zero, because thousands of legitimate names contain one.</p>');
+}
+
+function useCT(url, brand) {
+  $('#url').value = url; $('#brand').value = brand;
+  $('#url').scrollIntoView({behavior:'smooth', block:'center'});
+}
+async function dropCT(domain) {
+  await fetch('/api/ct-dismiss', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({domain})});
+  ctTick();
+}
+
+async function ctTick() {
+  try {
+    const d = await (await fetch('/api/ct-status')).json();
+    $('#ct_on').checked = d.on;
+    $('#notify_on').checked = d.notify;
+    $('#ct_kw').value = d.keywords || '';
+    if (document.activeElement !== $('#ct_min')) $('#ct_min').value = d.minutes;
+    if (d.running) $('#ct_note').textContent = 'scanning…';
+    renderCT(d.hits, d);
+  } catch (e) {}
+  setTimeout(ctTick, 20000);
+}
+
+async function setClipboard(on) {
+  await fetch('/api/clipboard-set', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({on})});
+  clipTick();
+}
+
+async function clipTick() {
+  try {
+    const d = await (await fetch('/api/clipboard')).json();
+    $('#clipon').checked = d.on;
+    const chip = $('#clipchip');
+    if (d.hit && d.hit.targets.length) {
+      chip.innerHTML = `<div class="card" style="border-color:var(--acc)">
+        <h2>Link on your clipboard</h2>
+        ${d.hit.targets.map(t => `<div class="target">
+          <div style="flex:1"><h3>${esc(t.url)}</h3>
+            <div>${t.brand ? `<span class="pill b">${esc(t.brand)}</span>` : ''}
+                 <span class="pill">${esc(t.domain)}</span></div></div>
+          <button class="go" onclick="grabClip('${esc(t.url)}','${esc(t.brand||'')}')">Use it</button>
+        </div>`).join('')}
+        <button class="ghost" onclick="clearClip()">Dismiss</button></div>`;
+    } else chip.innerHTML = '';
+  } catch (e) {}
+  setTimeout(clipTick, 3000);
+}
+async function grabClip(url, brand) {
+  $('#url').value = url; $('#brand').value = brand;
+  await clearClip();
+  $('#url').scrollIntoView({behavior:'smooth', block:'center'});
+}
+async function clearClip() {
+  await fetch('/api/clipboard-clear', {method:'POST', body:'{}'});
+  $('#clipchip').innerHTML = '';
+}
+
+async function loadCampaigns() {
+  const d = await (await fetch('/api/campaigns', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'})).json();
+  $('#campaigns').innerHTML = d.groups.length ? d.groups.map((g, i) => `
+    <div class="card" style="background:#0d1117">
+      <b>${g.size} pages</b>
+      ${g.brands.map(b => `<span class="pill b">${esc(b)}</span>`).join('')}
+      ${g.registrars.map(r => `<span class="pill">${esc(r)}</span>`).join('')}
+      <div class="note" style="margin-top:8px">${g.hosts.map(h => `<code>${esc(h)}</code>`).join(' · ')}</div>
+      <table style="margin-top:10px"><tr><th>Link</th><th>Evidence</th></tr>
+        ${g.links.map(l => `<tr><td class="note">${esc(l[0])} ↔ ${esc(l[1])}</td>
+          <td class="note">${esc(l[2].join('; '))}</td></tr>`).join('')}</table>
+      <button class="ghost" style="margin-top:10px" onclick="showComplaint(${i})">Combined registrar complaint</button>
+      <pre id="camp-${i}" class="hide" style="white-space:pre-wrap;background:#0d1117;border:1px solid var(--line);border-radius:6px;padding:12px;font-size:12px;margin-top:10px"></pre>
+    </div>`).join('')
+    : `<p class="note">No campaigns yet — ${d.cases} case(s) on file, none share distinctive infrastructure.</p>`;
+  window.__CAMPS = d.groups;
+}
+function showComplaint(i) {
+  const el = document.getElementById('camp-' + i);
+  el.textContent = window.__CAMPS[i].complaint;
+  el.classList.toggle('hide');
+}
+
+async function loadRecipes() {
+  const d = await (await fetch('/api/recipes', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'})).json();
+  $('#recipes').innerHTML = `<table><tr><th>Site</th><th>Steps learned</th><th>Last updated</th><th></th></tr>` +
+    d.recipes.map(r => `<tr><td>${esc(r.name)}</td>
+      <td class="${r.steps?'ok':'note'}">${r.steps || 'nothing yet'}</td>
+      <td class="note">${r.updated ? esc(new Date(r.updated).toLocaleString()) : '—'}</td>
+      <td>${r.steps ? `<button class="ghost" onclick="forget('${r.id}')">Forget</button>` : ''}</td></tr>`).join('')
+    + `</table>`;
+}
+async function forget(id) {
+  await fetch('/api/forget', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id})});
+  loadRecipes();
+}
+
+async function loadRuns() {
+  const d = await (await fetch('/api/history', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'})).json();
+  if (!d.cases.length) { $('#runs').innerHTML = '<p class="note">Nothing reported yet.</p>'; return; }
+  $('#runs').innerHTML = d.cases.map(c => {
+    const td = c.takedown || {};
+    const LABEL = {suspended:['ok','SUSPENDED by registrar'],
+                   offline:['warn','offline — still registered'],
+                   down:['ok','taken down'], blocked:['ok','blocked / warned'],
+                   'live-flagged':['warn','live, but flagged'], live:['bad','live, unflagged'],
+                   unknown:['note','not enough evidence']};
+    const lab = LABEL[td.state] || (td.checked ? LABEL.unknown : null);
+    const state = lab ? `<span class="${lab[0]}">${lab[1]}</span>` +
+        (td.why ? ` <span class="note">— ${esc(td.why)}</span>` : '')
+      : '<span class="note">not checked</span>';
+    const due = c.icann_eligible_at ? new Date(c.icann_eligible_at) : null;
+    const icann = due ? (due < new Date()
+        ? '<span class="warn">ICANN complaint now allowed</span>'
+        : `<span class="note">ICANN after ${due.toLocaleString()}</span>`) : '';
+    return `<div class="card" style="background:#0d1117">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+        <b><code>${esc(c.url || c.host)}</code></b>
+        <span class="note">${esc(new Date(c.first_reported).toLocaleString())}</span>
+      </div>
+      <div class="kv" style="margin-top:10px">
+        <b>Brand</b><span>${esc(c.brand || '—')}</span>
+        <b>Registrar</b><span>${esc(c.registrar || '—')}</span>
+        <b>Blocklist APIs</b><span>${c.apis_ok.length ? '<span class="ok">' + esc(c.apis_ok.join(', ')) + '</span>' : '<span class="note">none confirmed</span>'}</span>
+        <b>Vendor forms</b><span><span class="ok">${c.vendors_confirmed} confirmed</span> ·
+          <span class="warn">${c.vendors_clicked} clicked, unverified</span> ·
+          <span class="note">${c.vendors_total} touched</span></span>
+        <b>Emails</b><span>${c.emails_sent} of ${c.emails_total} marked sent</span>
+        <b>Site status</b><span>${state} ${td.checked ? '<span class="note">— checked ' + esc(new Date(td.checked).toLocaleString()) + (td.status && td.status.length ? ', ' + esc(td.status.join(', ')) : '') + '</span>' : ''}</span>
+        <b>Follow-up</b><span>${icann}</span>
+      </div>
+      <div style="margin-top:12px">
+        <button class="ghost" onclick="recheck('${esc(c.host)}', false)">Check status</button>
+        <button class="ghost" onclick="recheck('${esc(c.host)}', true)"
+          title="Fetches the page from your own IP">Check + fetch the page</button>
+        <button class="ghost" onclick="openCase('${esc(c.host)}')">Details</button>
+        <button class="ghost" onclick="escalation('${esc(c.host)}')">ICANN escalation</button>
+        <button class="ghost" onclick="makeBundle('${esc(c.host)}')">Evidence bundle</button>
+      </div>
+      <div id="case-${esc(c.host)}"></div>
+    </div>`;
+  }).join('');
+}
+
+async function recheck(host, touch) {
+  if (touch && !confirm('This fetches the phishing page from YOUR IP address.\n\n' +
+      'Every other check avoids that. Only do it if you want to see what the page serves now.'))
+    return;
+  const el = document.getElementById('case-' + host);
+  if (el) el.innerHTML = '<p class="note">checking registry, DNS, urlscan, VirusTotal…</p>';
+  const r = await fetch('/api/recheck', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({host, touch_site: !!touch})});
+  const d = await r.json();
+  await loadRuns();
+  showSignals(host, d.check);
+}
+
+const SIGNAL_NAMES = {registry:'Registry (RDAP)', dns:'DNS', urlscan:'urlscan.io',
+                      vt:'VirusTotal', http:'Direct fetch'};
+
+function showSignals(host, chk) {
+  const box = document.getElementById('case-' + host);
+  if (!box || !chk) return;
+  const rows = Object.entries(chk.signals).map(([k, v]) => {
+    let extra = '';
+    if (k === 'dns') extra = `${(v.ips||[]).join(', ')}<br><span class="note">ns: ${esc((v.ns||[]).join(', '))}</span>`
+      + (v.ns_changed ? ' <span class="warn">nameservers moved</span>' : '');
+    if (k === 'registry') extra = esc((v.status||[]).join(', '));
+    if (k === 'vt' && v.ok) extra = `<span class="${v.flagged?'ok':'warn'}">${v.malicious} malicious · ${v.suspicious} suspicious</span> <span class="note">of ${v.harmless + v.malicious + v.suspicious} engines</span>`;
+    if (k === 'urlscan' && v.report) extra = `<a href="${esc(v.report)}" target="_blank" rel="noopener noreferrer">scan report</a>`;
+    if (k === 'http') extra = `HTTP ${v.code}` + (v.cloudflare_warning ? ' <span class="ok">phishing interstitial</span>' : '');
+    return `<tr><td>${SIGNAL_NAMES[k] || k}</td>
+      <td class="${v.ok === false ? 'note' : ''}">${esc(v.note || '')}</td>
+      <td class="note">${extra}</td></tr>`;
+  }).join('');
+  box.dataset.open = '1';
+  box.innerHTML = `<div style="margin-top:14px">
+    <h2>Status signals</h2>
+    <p class="note">Nothing here contacts the phishing site${chk.touched_site ? ', except the direct fetch you asked for' : ' — the scammer never sees your IP'}.</p>
+    <table><tr><th>Source</th><th>Reading</th><th>Detail</th></tr>${rows}</table>
+    <p class="note" style="margin-top:10px">Checked ${esc(new Date(chk.checked).toLocaleString())}.
+      <button class="ghost" onclick="openCase('${esc(host)}')">Full case details</button></p>
+  </div>`;
+}
+
+async function openCase(host) {
+  const box = document.getElementById('case-' + host);
+  if (box.dataset.open === '1') { box.innerHTML = ''; box.dataset.open = '0'; return; }
+  const d = await (await fetch('/api/case', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({host})})).json();
+  const c = d.case || {};
+  const vendors = Object.entries(c.vendors || {}).map(([id, v]) =>
+    `<tr><td>${esc(v.name || id)}</td>
+       <td class="${v.verified?'ok':v.submitted?'warn':'note'}">${v.verified?'confirmed':v.submitted?'clicked, unverified':'not submitted'}</td>
+       <td class="note">${esc(v.status || '')}</td>
+       <td class="note">${esc((v.picked||[]).join('; ')) || '—'}</td>
+       <td class="note">${v.ts ? esc(new Date(v.ts).toLocaleString()) : ''}</td></tr>`).join('');
+  const emails = Object.entries(c.emails || {}).map(([to, e]) =>
+    `<tr><td><code>${esc(to)}</code></td><td class="note">${esc(e.label||'')}</td>
+       <td><label style="display:flex;gap:6px;align-items:center;margin:0">
+         <input type="checkbox" ${e.sent?'checked':''}
+           onchange="markSent('${esc(host)}','${esc(to)}',this.checked)"> sent</label></td>
+       <td>${e.mailto?`<a href="${esc(e.mailto)}">Mail app</a>`:''}
+           ${e.gmail?` · <a href="${esc(e.gmail)}" target="_blank" rel="noopener noreferrer">Gmail</a>`:''}</td>
+       <td class="note">${e.sent_ts ? esc(new Date(e.sent_ts).toLocaleString()) : ''}</td></tr>`).join('');
+  box.dataset.open = '1';
+  const timeline = (c.checks || []).slice().reverse().map(k =>
+    `<tr><td class="note">${esc(new Date(k.checked).toLocaleString())}</td>
+       <td>${esc(k.state)}</td><td class="note">${esc(k.why)}</td></tr>`).join('');
+  const ev = c.evidence || {};
+  const evidence = (ev.screenshot || ev.report) ? `<h2>Evidence</h2>
+    <p class="note">Captured by urlscan.io, so you never loaded the page yourself.</p>
+    ${ev.screenshot ? `<img src="${esc(ev.screenshot)}" alt="page screenshot"
+      style="max-width:420px;border:1px solid var(--line);border-radius:6px">` : ''}
+    ${ev.report ? `<p><a href="${esc(ev.report)}" target="_blank" rel="noopener noreferrer">full scan report</a></p>` : ''}` : '';
+  box.innerHTML = `<div style="margin-top:14px">
+    ${evidence}
+    ${timeline ? `<h2 style="margin-top:16px">Status over time</h2>
+      <table><tr><th>Checked</th><th>State</th><th>Why</th></tr>${timeline}</table>` : ''}
+    <h2 style="margin-top:16px">Vendor forms</h2>
+    <table><tr><th>Site</th><th>Result</th><th>Detail</th><th>Choices</th><th>When</th></tr>${vendors || '<tr><td class="note">none</td></tr>'}</table>
+    <h2 style="margin-top:16px">Email complaints</h2>
+    <p class="note">Tick what you actually sent — the tool cannot know, and the ICANN
+      follow-up needs the date.</p>
+    <table><tr><th>To</th><th>Who</th><th>Sent</th><th>Compose</th><th>When</th></tr>${emails || '<tr><td class="note">none</td></tr>'}</table>
+  </div>`;
+}
+
+async function makeBundle(host) {
+  const box = document.getElementById('case-' + host);
+  box.dataset.open = '1';
+  box.innerHTML = '<p class="note">building the bundle, fetching the capture…</p>';
+  const d = await (await fetch('/api/bundle', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({host})})).json();
+  if (d.error) { box.innerHTML = `<p class="bad">${esc(d.error)}</p>`; return; }
+  box.innerHTML = `<div style="margin-top:14px">
+    <h2>Evidence bundle</h2>
+    <p class="note">Everything this case knows, readable by someone who was not here —
+      for a registrar, a bank, or a police report.</p>
+    <p><a href="${esc(d.download)}" download><b>${esc(d.file)}</b></a></p>
+    <table><tr><th>File</th></tr>${d.contents.map(f => `<tr><td><code>${esc(f)}</code></td></tr>`).join('')}</table>
+    <p class="note">Saved at <code>${esc(d.path)}</code>. Open <code>report.html</code> and
+      print to PDF if you need one document.</p>
+    <button class="ghost" onclick="openCase('${esc(host)}')">Back to case details</button>
+  </div>`;
+}
+
+async function escalation(host) {
+  const d = await (await fetch('/api/escalation', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({host})})).json();
+  const box = document.getElementById('case-' + host);
+  box.dataset.open = '1';
+  box.innerHTML = `<div style="margin-top:14px">
+    <h2>ICANN escalation</h2>
+    ${d.ready
+      ? `<p class="ok">Ready to file. ICANN enforces the registrar's duty to act, so this
+         only works because the registrar was contacted and did nothing.</p>
+         <p><a href="${esc(d.form)}" target="_blank" rel="noopener noreferrer">Open the ICANN abuse report form</a>
+         — paste the text below into it.</p>`
+      : `<p class="warn">Not ready yet:</p><ul class="note">${d.blockers.map(b => `<li>${esc(b)}</li>`).join('')}</ul>`}
+    <pre style="white-space:pre-wrap;background:#0d1117;border:1px solid var(--line);border-radius:6px;padding:12px;font-size:12px">${esc(d.text)}</pre>
+    <button class="ghost" onclick="navigator.clipboard.writeText(document.querySelector('#case-${esc(host)} pre').textContent)">Copy</button>
+    <button class="ghost" onclick="openCase('${esc(host)}')">Back to case details</button>
+  </div>`;
+}
+
+async function markSent(host, to, sent) {
+  await fetch('/api/mark-sent', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({host, to, sent})});
+}
+
+boot();
+liveTick();
+loadWiring();
+clipTick();
+ctTick();
+</script>
