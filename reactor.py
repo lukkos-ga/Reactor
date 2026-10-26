@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""fuckscammer - one-shot phishing URL abuse reporter.
+"""reactor - one-shot phishing URL abuse reporter.
 
 Paste a phishing URL, it does recon (RDAP/DNS), submits to every abuse API it
 can reach, writes ready-to-send .eml complaints for the ones that are email-only,
@@ -8,9 +8,9 @@ and prints the human-only web forms with the URL pre-filled.
 Stdlib only. No pip install.
 
 Usage:
-    python3 fuckscammer.py https://www.example.top/          # dry run, recon only
-    python3 fuckscammer.py https://www.example.top/ --send   # actually report
-    python3 fuckscammer.py --selftest
+    python3 reactor.py https://www.example.top/          # dry run, recon only
+    python3 reactor.py https://www.example.top/ --send   # actually report
+    python3 reactor.py --selftest
 
 Env (all optional, unlocks more targets):
     REPORTER_EMAIL   your email - required by Netcraft + used as From: in .eml

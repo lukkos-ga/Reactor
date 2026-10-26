@@ -77,7 +77,7 @@ def on_state(host, url, old, new, enabled=True):
     msg = transition(host, old, new)
     if not msg or not enabled:
         return None
-    send("fuckscammer", f"{host} {msg}", url or "")
+    send("reactor", f"{host} {msg}", url or "")
     return msg
 
 

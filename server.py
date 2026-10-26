@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Local GUI for fuckscammer. Serves http://127.0.0.1:8420 - localhost only,
+"""Local GUI for reactor. Serves http://127.0.0.1:8420 - localhost only,
 nothing is exposed to the network.
 
     ./run.sh          (or:  .venv/bin/python server.py)
@@ -31,7 +31,7 @@ import gmailslots
 import intake
 import notify
 import status
-import fuckscammer as fs
+import reactor as fs
 from sites import SITES
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -246,7 +246,7 @@ def monitor_loop():
                     pass
             for c in casefile.all_cases():
                 if escalate.readiness(c).get("ready"):
-                    notify.once(f"icann:{c['host']}", "fuckscammer",
+                    notify.once(f"icann:{c['host']}", "reactor",
                                 f"{c['host']}: the registrar's 24h window has closed — "
                                 f"the ICANN complaint is ready to file",
                                 enabled=cfg.get("notify") == "on")
@@ -302,7 +302,7 @@ def ct_loop():
                     STATE["ct_last"] = r
                     if r["new"] and cfg.get("notify") == "on":
                         top = max(r["new"], key=lambda h: h["score"])
-                        notify.send("fuckscammer — new lookalike certificate",
+                        notify.send("reactor — new lookalike certificate",
                                     f"{len(r['new'])} new candidate(s), top: {top['domain']}",
                                     "; ".join(top["why"])[:80])
                 except Exception as e:
@@ -492,7 +492,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, {"state": ctwatch.dismiss(payload.get("domain", ""))})
 
         if route == "/api/notify-test":
-            ok = notify.send("fuckscammer", "Notifications are working", "test")
+            ok = notify.send("reactor", "Notifications are working", "test")
             return self._send(200, {"sent": ok})
 
         if route == "/api/bundle":
@@ -703,7 +703,7 @@ if __name__ == "__main__":
         STATE["ct_thread"] = threading.Thread(target=ct_loop, daemon=True)
         STATE["ct_thread"].start()
     srv = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
-    print(f"fuckscammer GUI -> http://127.0.0.1:{PORT}   (localhost only, Ctrl-C to stop)")
+    print(f"reactor GUI -> http://127.0.0.1:{PORT}   (localhost only, Ctrl-C to stop)")
     try:
         webbrowser.open(f"http://127.0.0.1:{PORT}")
     except Exception:

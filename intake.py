@@ -8,7 +8,7 @@ have already reported.
 import re
 import urllib.parse
 
-import fuckscammer as fs
+import reactor as fs
 
 # Scam texts mangle links to dodge filters: hxxps, [.], (dot), spaces.
 DEOBF = [

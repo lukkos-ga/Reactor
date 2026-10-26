@@ -1,4 +1,4 @@
-# fuckscammer
+# reactor
 
 Paste one phishing URL. It notifies every abuse desk that matters.
 
@@ -327,9 +327,9 @@ Adding another country means one entry in `channels.py` — nothing else is coun
 
 - `server.py` — GUI + local API
 - `ui.html` — the interface
-- `fuckscammer.py` — recon, blocklist APIs, complaint emails (also usable standalone: `python3 fuckscammer.py <url> --send`)
+- `reactor.py` — recon, blocklist APIs, complaint emails (also usable standalone: `python3 reactor.py <url> --send`)
 - `automate.py` — Playwright driver, field classifier
 - `sites.py` — the vendor list and what you must click on each
 - `reports/` — `.eml` drafts, `runs.jsonl`, `log.jsonl`
 
-Self-checks: `python3 fuckscammer.py --selftest` and `python3 automate.py`.
+Self-checks: `python3 reactor.py --selftest` and `python3 automate.py`.

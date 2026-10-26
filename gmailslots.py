@@ -1,7 +1,7 @@
 """Work out which Gmail account sits in which /u/N/ slot.
 
 There is no way to read this without Google cookies, so detection runs in
-fuckscammer's own persistent browser profile. You sign into your Google accounts
+reactor's own persistent browser profile. You sign into your Google accounts
 in that window once, by hand - this tool never types a credential - and every
 later detection reuses the session.
 
@@ -117,7 +117,7 @@ def merge(identities, detected):
     that actually sends it - alice+abuse@gmail.com is delivered by the
     alice@gmail.com session. Anything not already saved is added.
     """
-    from fuckscammer import base_mailbox as base
+    from reactor import base_mailbox as base
 
     by_base = {base(d["email"]): d["index"] for d in detected}
     out, have = [], set()

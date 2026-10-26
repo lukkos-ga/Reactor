@@ -19,7 +19,7 @@ import socket
 import urllib.parse
 from datetime import datetime, timezone
 
-import fuckscammer as fs
+import reactor as fs
 
 HOLD_STATES = ("client hold", "server hold", "clienthold", "serverhold",
                "pending delete", "redemption", "suspended")
@@ -115,7 +115,7 @@ def check_safebrowsing(url):
     key = os.getenv("GSB_API_KEY")
     if not key:
         return {"ok": False, "note": "no Google Safe Browsing key set"}
-    body = {"client": {"clientId": "fuckscammer", "clientVersion": "1.0"},
+    body = {"client": {"clientId": "reactor", "clientVersion": "1.0"},
             "threatInfo": {
                 "threatTypes": ["MALWARE", "SOCIAL_ENGINEERING", "UNWANTED_SOFTWARE",
                                 "POTENTIALLY_HARMFUL_APPLICATION"],

@@ -12,4 +12,4 @@ If a credential is accidentally committed, revoke/rotate it immediately and remo
 
 ## Scope and safe use
 
-FUCKSCAMMER is intended to help report suspected phishing and scam infrastructure to legitimate abuse-reporting channels. It should not be used to attack, disrupt, probe, or gain unauthorized access to third-party systems. Verify targets before submitting reports to reduce false positives.
+REACTOR is intended to help report suspected phishing and scam infrastructure to legitimate abuse-reporting channels. It should not be used to attack, disrupt, probe, or gain unauthorized access to third-party systems. Verify targets before submitting reports to reduce false positives.

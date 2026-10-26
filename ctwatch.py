@@ -18,7 +18,7 @@ import time
 import urllib.parse
 from datetime import datetime, timedelta, timezone
 
-import fuckscammer as fs
+import reactor as fs
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATE = os.path.join(HERE, "reports", "ctwatch.json")

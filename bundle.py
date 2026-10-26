@@ -56,7 +56,7 @@ def report_html(case, has_shot):
 
     parts = [f"<h1>Phishing report: {e(r.get('domain') or case.get('host') or '')}</h1>",
              f"<div class='sub'>Compiled {datetime.now(timezone.utc).isoformat(timespec='seconds')} "
-             f"by fuckscammer. All times UTC.</div>"]
+             f"by reactor. All times UTC.</div>"]
 
     parts += ["<h2>Target</h2><table class='kv'>", _rows([
         ("Phishing URL", f"<code>{e(case.get('url') or '')}</code>"),
