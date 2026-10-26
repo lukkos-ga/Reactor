@@ -1,16 +1,16 @@
 # reactor
 
-Paste one phishing URL. It notifies every abuse desk that matters.
+Вставляете одну фишинговую ссылку — он уведомляет все стоящие внимания abuse-службы.
 
 ```bash
 ./run.sh
 ```
 
-Opens the GUI at http://127.0.0.1:8420 (localhost only, never exposed to the network).
+Открывает GUI на http://127.0.0.1:8420 (только localhost, наружу не выставляется).
 
-## Install
+## Установка
 
-Requires Python 3 and Chromium via Playwright.
+Требуются Python 3 и Chromium через Playwright.
 
 ```bash
 python3 -m venv .venv
@@ -21,315 +21,318 @@ cp config.example.json config.json
 ./run.sh
 ```
 
-Add your own API credentials in `config.json` or through the local Settings UI. `config.json` is ignored by Git. Never commit API keys, SMTP credentials, browser profiles, or generated reports.
+Свои API-ключи добавьте в `config.json` или через локальный интерфейс настроек. `config.json` игнорируется Git'ом. Никогда не коммитьте API-ключи, SMTP-реквизиты, профили браузера или сформированные отчёты.
 
-## Paste the message, not the URL
+## Вставляйте сообщение, а не ссылку
 
-Step 1 on the Report tab is a box you paste the whole scam SMS into. It:
+Шаг 1 на вкладке Report — поле, в которое вставляется весь текст мошеннической SMS целиком. Оно:
 
-- pulls out every link, including `hxxps://`, `[.]`, `(dot)`, `{.}` and spaced-out forms
-- works out the spoofed brand from the **wording**, not the domain — scam domains are
-  deliberately meaningless, but the text always says "WhatsApp" or "Telegram"
-- names the scam signals it recognises (urgency, suspension threat, OTP fishing) so you can
-  quote them in a report
-- expands known shorteners only — an ordinary phishing link is never fetched
-- greys out anything already in your history
+- извлекает все ссылки, включая формы `hxxps://`, `[.]`, `(dot)`, `{.}` и с разрядкой
+- определяет подделанный бренд по **формулировке**, а не по домену — мошеннические домены
+  специально бессмысленны, но текст всегда говорит «WhatsApp» или «Telegram»
+- называет распознанные признаки мошенничества (срочность, угроза блокировки, выуживание OTP),
+  чтобы вы могли сослаться на них в жалобе
+- разворачивает только известные сокращатели — обычная фишинговая ссылка никогда не запрашивается
+- приглушает то, что уже есть в вашей истории
 
-Then check the ones you want and **Report all checked**: recon, blocklist APIs and complaint
-drafts for each. Vendor forms stay one page at a time — use **Use as single target**.
+Затем отметьте нужные цели и нажмите **Report all checked**: разведка, API блок-листов и
+черновики жалоб по каждой. Формы вендоров остаются по одной странице за раз — используйте
+**Use as single target**.
 
-## What one click does
+## Что делает одно нажатие
 
-| Stage | What happens | Automatic? |
+| Этап | Что происходит | Автоматически? |
 |---|---|---|
-| Recon | RDAP + DNS: registrar, registration date, hosting network, published abuse contacts | yes |
-| Blocklist APIs | Netcraft, urlscan.io, VirusTotal | yes |
-| Email complaints | Registrar, hosting/network, impersonated brand, APWG | drafts always; auto-sent if SMTP configured |
-| Vendor forms | 15 vendors opened **in parallel** (5 at a time, ~16s), text filled, threat type/category selected, learned steps replayed | filled + classified; **Submit all** fires every CAPTCHA-free form |
-| History | One case file per target — evidence for the ICANN follow-up | yes |
+| Recon | RDAP + DNS: регистратор, дата регистрации, хостинг-сеть, опубликованные abuse-контакты | да |
+| API блок-листов | Netcraft, urlscan.io, VirusTotal | да |
+| Email-жалобы | Регистратору, хостингу/сети, подделанному бренду, в APWG | всегда черновики; автоотправка, если настроен SMTP |
+| Формы вендоров | 15 вендоров открываются **параллельно** (по 5 за раз, ~16 с), текст заполняется, тип/категория угрозы выбираются, выученные шаги воспроизводятся | заполняется + классифицируется; **Submit all** отправляет все формы без CAPTCHA |
+| История | Одно дело на цель — доказательства для последующей жалобы в ICANN | да |
 
-## Learning
+## Обучение
 
-While the tabs are open it records what you click and choose, per site, into
-`recipes/<site>.json`. Next run replays those steps before handing the tab back to you,
-so a form you drove by hand once is driven for you afterwards.
+Пока вкладки открыты, он записывает, что вы нажимаете и выбираете, по каждому сайту,
+в `recipes/<site>.json`. При следующем запуске эти шаги воспроизводятся перед тем,
+как вернуть вкладку вам, — форма, которой вы один раз управили вручную, дальше управляется сама.
 
-Recording is armed **only while a tab is yours**. The driver disarms it while it fills
-forms itself, otherwise it learns its own autofill and the recipes fill with noise.
+Запись включается **только пока вкладка ваша**. Драйвер отключает её, пока сам заполняет
+формы, — иначе он выучит собственный автозаполн, и рецепты заполнятся шумом.
 
-### It has to survive a change of victim brand
+### Обучение должно переживать смену подделываемого бренда
 
-A recipe learned reporting a fake Telegram page gets replayed on a fake WhatsApp page.
-Anything target-specific must therefore be re-derived, not replayed. Every recorded step
-is tagged at save time:
+Рецепт, выученный на жалобе на фальшивую страницу Telegram, воспроизводится на фальшивой
+странице WhatsApp. Поэтому всё, что относится к конкретной цели, должно выводиться заново,
+а не воспроизводиться. Каждый записанный шаг помечается при сохранении:
 
-| Tag | Example | On the next report |
+| Метка | Пример | При следующей жалобе |
 |---|---|---|
-| `threat` | "Phishing", "Malicious site" | replayed as-is — means the same thing every time |
-| `brand` | "Telegram" | **re-picked** — the dropdown is searched for the new brand |
-| `target` | "tegexyy.top" | re-derived from the new URL |
-| `sticky` | "Financial services" | replayed, but flagged in the *Check these* column |
+| `threat` | «Phishing», «Malicious site» | воспроизводится как есть — означает одно и то же каждый раз |
+| `brand` | «Telegram» | **выбирается заново** — в выпадающем списке ищется новый бренд |
+| `target` | «tegexyy.top» | выводится заново из нового URL |
+| `sticky` | «Financial services» | воспроизводится, но помечается в колонке *Check these* |
 
-Free text is tokenized at substring level, so `Fake Telegram login at tegexyy.top` is stored
-as `Fake {{brand}} login at {{domain}}` and re-renders as `Fake whatsapp login at fake-wa.xyz`.
-A recipe that still contains the brand or domain it was learned on fails the selftest.
+Свободный текст токенизируется на уровне подстрок, поэтому `Fake Telegram login at tegexyy.top`
+сохраняется как `Fake {{brand}} login at {{domain}}` и при воспроизведении превращается в
+`Fake whatsapp login at fake-wa.xyz`. Рецепт, в котором всё ещё остался бренд или домен,
+на котором он выучен, проваливает selftest.
 
-- Passwords are never recorded.
-- Long unrecognised prose (>120 chars) is stored as `{{typed}}` — the field is remembered,
-  the words are not. Short generic answers ("Credential harvesting") are kept, since they
-  are what makes replay useful and contain nothing about you.
-- A recorded Submit click is deliberately never replayed. Submitting stays an explicit press.
-- History tab lists what's been learned, with a Forget button per site.
+- Пароли никогда не записываются.
+- Длинный нераспознанный текст (>120 символов) сохраняется как `{{typed}}` — поле запоминается,
+  слова нет. Короткие общие ответы («Credential harvesting») сохраняются: именно они делают
+  воспроизведение полезным, а про вас в них ничего нет.
+- Записанное нажатие Submit намеренно никогда не воспроизводится. Отправка остаётся явным нажатием.
+- Вкладка History показывает, что выучено, с кнопкой Forget для каждого сайта.
 
-## Two-stage forms
+## Двухэтапные формы
 
-Most vendors look the URL up first and only then show the threat-category form. One press
-of **Submit all** advances one stage: the tool clicks, sees the new form, fills and classifies
-it, and asks for another press. You watch each stage rather than blind-clicking a flow.
+У большинства вендоров сначала идёт поиск URL и только потом появляется форма с категорией
+угрозы. Одно нажатие **Submit all** продвигает на один этап: инструмент нажимает, видит новую
+форму, заполняет и классифицирует её и просит нажать ещё раз. Вы видите каждый этап, а не
+кликаете вслепую по всему потоку.
 
-## Ground rules baked in
+## Встроенные правила
 
-- **Never navigates to the phishing site.** The URL is only ever typed into other people's forms as text. Don't open it yourself either.
-- **Never solves a CAPTCHA.** Sites guarded by one are detected at runtime and can only be submitted by your hand.
-- **Nothing is submitted until you press Submit all**, behind a confirm dialog.
-- **Never claims a report was filed unless the site confirmed it.** A confirmation phrase alone isn't enough — the submit control must also be gone. Anything less is logged as `verify it`, not `confirmed`.
-- **Never accepts terms on your behalf** (Symantec gates on a ToS click — that one is yours).
-- Browser runs in `.browser-profile/`, a throwaway profile. None of your real logins, cookies or history are visible to these sites.
-- `config.json` holds API keys and the SMTP password, chmod 600.
+- **Никогда не переходит на фишинговый сайт.** URL лишь вводится текстом в чужие формы. Не открывайте его и сами.
+- **Никогда не решает CAPTCHA.** Защищённые ею сайты определяются во время работы, и отправить их может только ваша рука.
+- **Ничего не отправляется, пока вы не нажали Submit all**, за диалогом подтверждения.
+- **Никогда не утверждает, что жалоба подана, если сайт не подтвердил это.** Одной фразы-подтверждения мало — элемент отправки должен ещё и исчезнуть. Всё остальное записывается как `verify it`, а не `confirmed`.
+- **Никогда не принимает условия использования за вас** (Symantec требует клика по ToS — этот клик ваш).
+- Браузер работает в `.browser-profile/` — одноразовом профиле. Ни ваши реальные логины, ни cookie, ни история этим сайтам не видны.
+- В `config.json` лежат API-ключи и пароль SMTP, chmod 600.
 
-## Vendor form status, measured 2026-09-05
+## Состояние форм вендоров, замерено 2026-09-05
 
-Autofilled and parked: Google Safe Browsing, Microsoft SmartScreen, Fortiguard, BrightCloud,
-CRDF, Netcraft, Palo Alto, ESET, Trend Micro, McAfee/Trellix, Spam404.
+Заполняются автоматически и ожидают: Google Safe Browsing, Microsoft SmartScreen, Fortiguard,
+BrightCloud, CRDF, Netcraft, Palo Alto, ESET, Trend Micro, McAfee/Trellix, Spam404.
 
-Opens but cannot be autofilled, for reasons the GUI spells out per tab:
-- **Symantec** — blocks on a Terms of Service click first
-- **Cisco Talos** — Cloudflare bot check
-- **Kaspersky OpenTIP** — lookup is pre-filled by URL; submitting a verdict needs a free account
-- **Bitdefender** — publishes instructions, not a form (mail `submit@bitdefender.com`)
-- **Forcepoint CSI** — off by default, `csi.forcepoint.com` fails to resolve; re-enable in `sites.py` if it returns
+Открываются, но не заполняются автоматически — причины GUI объясняет на каждой вкладке:
+- **Symantec** — сначала требует клик по условиям использования
+- **Cisco Talos** — проверка Cloudflare на ботов
+- **Kaspersky OpenTIP** — поиск предзаполнен URL; отправка вердикта требует бесплатного аккаунта
+- **Bitdefender** — публикует инструкцию, а не форму (почта `submit@bitdefender.com`)
+- **Forcepoint CSI** — выключен по умолчанию, `csi.forcepoint.com` не резолвится; включите обратно в `sites.py`, если заработает
 
-## Reporting accounts
+## Аккаунты для жалоб
 
-Settings holds a list of addresses you report from; the Report tab has a switcher. The
-active one drives the vendor form fields, the `From:` on the complaint drafts, and which
-Gmail composes the message.
+В Settings хранится список адресов, с которых вы жалуетесь; на вкладке Report есть переключатель.
+Активный подставляет поля форм вендоров, `From:` в черновиках жалоб и определяет, с какого
+Gmail отправляется письмо.
 
-The Gmail link picks the sending account by **address**, not by position:
-`https://mail.google.com/mail/?authuser=<your address>&view=cm&...`
+Ссылка Gmail выбирает аккаунт отправки **по адресу**, а не по позиции:
+`https://mail.google.com/mail/?authuser=<ваш адрес>&view=cm&...`
 
-The `/u/N/` slot is a position in one browser's session list. If that position is empty,
-Gmail silently drops you to `/u/0/` and you send from the wrong account — which is exactly
-what happened here. An address cannot be wrong, so leave **Gmail slot** blank.
+Слот `/u/N/` — это позиция в списке сессий одного браузера. Если позиция пуста, Gmail молча
+перебрасывает вас на `/u/0/`, и вы отправляете не с того аккаунта — здесь ровно так и случилось.
+Адрес ошибиться не может, поэтому оставляйте **Gmail slot** пустым.
 
-A plus-alias is reduced to its real mailbox for `authuser`, since `you+abuse@gmail.com` is
-delivered by the `you@gmail.com` session and sends as it anyway.
+Плюс-алиас сводится к реальному ящику для `authuser`: `you+abuse@gmail.com` доставляется в
+сессию `you@gmail.com` и отправляется с неё же.
 
-**Gmail slot** remains as an optional override if you want to pin the `/u/N/` path. Blank
-means select by address, which is what you want. **Detect slots from Gmail** still exists
-for that case; it is no longer needed for normal use.
+**Gmail slot** остаётся как опциональное переопределение, если вы хотите закрепить путь `/u/N/`.
+Пусто означает выбор по адресу — это то, что нужно. Кнопка **Detect slots from Gmail** тоже
+осталась для этого случая; для обычного использования она больше не нужна.
 
-A page served from localhost cannot read your Gmail to work slots out on its own —
-cross-origin isolation forbids it, which is why detection has to drive a separate browser.
-Selecting by address sidesteps the whole problem.
+Страница, отдаваемая с localhost, не может прочитать ваш Gmail, чтобы вычислить слоты, —
+изоляция кросс-доменных источников это запрещает, поэтому определению нужен отдельный браузер.
+Выбор по адресу обходит проблему целиком.
 
-SMTP stays global. If you set it and then switch identity, the GUI warns you that the SMTP
-user no longer matches the From address — use the compose links rather than SMTP in that case.
+SMTP остаётся глобальным. Если вы настроили его и затем переключили личность, GUI предупредит,
+что SMTP-пользователь больше не совпадает с адресом From — в этом случае пользуйтесь ссылками
+создания письма вместо SMTP.
 
-## History
+## История
 
-One case file per reported page: `reports/<host>/case.json`. The target is the useful
-unit, not the run — you report the same URL over several sessions and later need to know
-what went where, when, and whether it came down. Everything merges into that one file:
-recon, blocklist API results, email drafts and whether you sent them, every vendor form
-outcome, and takedown checks.
+Одно дело на каждую пожалованную страницу: `reports/<host>/case.json`. Единица полезного — цель,
+а не запуск: вы жалуетесь на один и тот же URL в течение нескольких сессий, а потом вам нужно
+знать, что куда ушло, когда и лёг ли сайт. Всё сливается в этот один файл: разведка, результаты
+API блок-листов, черновики писем и отправлены ли они, исход каждой формы вендора и проверки
+доступности.
 
-Written **as each result lands**, not at session end, so killing the browser or the server
-loses nothing.
+Запись идёт **по мере поступления каждого результата**, а не в конце сессии, поэтому убийство
+браузера или сервера ничего не теряет.
 
-The History tab shows, per page: which APIs confirmed, how many vendor forms are confirmed
-vs merely clicked, which emails you have ticked as sent, when the ICANN complaint window
-opens (24h after first report), and a **Check if it is down** button.
+Вкладка History показывает по каждой странице: какие API подтвердили, сколько форм вендоров
+подтверждены против просто кликнутых, какие письма отмечены отправленными, когда открывается
+окно жалобы в ICANN (24 ч с первой жалобы) и кнопку **Check if it is down**.
 
-### Status checks
+### Проверки статуса
 
-**Check status** gathers five signals and never contacts the phishing site:
+**Check status** собирает пять сигналов и никогда не обращается к фишинговому сайту:
 
-| Source | What it proves |
+| Источник | Что доказывает |
 |---|---|
-| Registry (RDAP) | `clientHold`/`serverHold` **is** the takedown — authoritative |
-| DNS | still resolving? have the nameservers moved to a sinkhole? |
-| urlscan.io | has anyone scanned it, and did the scan call it malicious (no key needed) |
-| VirusTotal | how many engines flag it now (needs your free key) |
+| Реестр (RDAP) | `clientHold`/`serverHold` — это и есть тейкдаун, авторитетно |
+| DNS | всё ещё резолвится? ушли ли неймсерверы в синкил? |
+| urlscan.io | сканировал ли кто-то, и назвал ли скан сайт вредоносным (ключ не нужен) |
+| VirusTotal | сколько движков помечают сейчас (нужен ваш бесплатный ключ) |
 
-**Check + fetch the page** adds a sixth that *does* reach the site from your IP, behind a
-confirm dialog. It is the only way to see a Cloudflare phishing interstitial or a dead
-origin, and is off by default.
+**Check + fetch the page** добавляет шестой сигнал, который *действительно* обращается к сайту
+с вашего IP, за диалогом подтверждения. Это единственный способ увидеть межстраничную
+фишинговую заглушку Cloudflare или мёртвый источник; по умолчанию выключено.
 
-Verdicts:
+Вердикты:
 
-- `down` — registry hold, or the hostname stopped resolving
-- `blocked` — Cloudflare is warning visitors, or the origin is returning errors
-- `live-flagged` — still up, but blocklists have caught it (victims now get warnings)
-- `live` — up and not yet flagged anywhere
-- `unknown` — not enough evidence
+- `down` — холд реестра или хостнейм перестал резолвиться
+- `blocked` — Cloudflare предупреждает посетителей или источник отдаёт ошибки
+- `live-flagged` — сайт жив, но блок-листы его уже поймали (жертвы видят предупреждения)
+- `live` — жив и нигде ещё не помечен
+- `unknown` — доказательств недостаточно
 
-*Down* is only ever claimed on positive evidence. A failed lookup reads as unknown, never
-as a takedown: being told a live phishing page is gone would stop you chasing it. Ordinary
-EPP states like `clientTransferProhibited` are not holds.
+*Down* заявляется только по положительному доказательству. Неудавшийся запрос читается как
+unknown, никогда как тейкдаун: узнать, что живая фишинговая страница «исчезла», — значит
+перестать её добивать. Обычные EPP-состояния вроде `clientTransferProhibited` холдами не являются.
 
-Every check appends to the case file, so the History tab shows the state over time and the
-moment it first went down.
+Каждая проверка дописывается в файл дела, поэтому вкладка History показывает состояние во
+времени и момент, когда сайт лёг впервые.
 
-### Live monitor
+### Живой монитор
 
-The Report tab carries a live status strip, refreshed every 10s. Turn on **keep checking
-automatically** and the server re-checks every open case on a timer (default 15 min).
-Cases that have gone `down` stop being polled — nothing left to learn.
+На вкладке Report есть живая строка статуса, обновляется каждые 10 с. Включите **keep checking
+automatically**, и сервер будет по таймеру перепроверять каждое открытое дело (по умолчанию
+15 мин). Дела, ушедшие в `down`, перестают опрашиваться — учиться там больше нечему.
 
-**include a page fetch** adds the direct request that catches a Cloudflare interstitial or
-a dead origin. It is the most useful signal and the only one that reaches the site from
-your IP, on every sweep. Uncheck it if you would rather stay invisible.
+**include a page fetch** добавляет прямой запрос, ловящий заглушку Cloudflare или мёртвый
+источник. Это самый полезный сигнал и единственный, который ходит на сайт с вашего IP, в каждом
+проходе. Снимите галочку, если хотите оставаться невидимым.
 
-The monitor restarts with the server when it is left on.
+Монитор перезапускается вместе с сервером, если был оставлен включённым.
 
-### How long a takedown takes
+### Сколько занимает тейкдаун
 
-| Channel | Typical | Notes |
+| Канал | Обычно | Примечания |
 |---|---|---|
-| Blocklists (Netcraft, Safe Browsing, SmartScreen) | hours to ~2 days | browser warnings; the site stays up but stops converting |
-| Cloudflare | ~1–3 days | they do not host it; they forward to the origin and often add a phishing interstitial |
-| Registrar suspension | days to weeks, sometimes never | ICANN RAA requires investigation within 24h of a report, but sets no removal deadline |
+| Блок-листы (Netcraft, Safe Browsing, SmartScreen) | часы до ~2 дней | предупреждения браузера; сайт жив, но перестаёт конвертировать |
+| Cloudflare | ~1–3 дня | они его не хостят; пересылают источнику и часто вешают фишинговую заглушку |
+| Приостановка регистратором | дни до недель, иногда никогда | RAA от ICANN требует разбора в течение 24 ч после жалобы, но срока снятия не задаёт |
 
-Median credential-phishing lifetime is a couple of days, with a long tail. The blocklists
-are the leverage, not the registrar.
+Медианное время жизни фишинга с кражей учётных данных — пара дней с длинным хвостом.
+Рычаг — блок-листы, а не регистратор.
 
-## Campaigns
+## Кампании
 
-History groups pages that look like one operator. Naive clustering would be worse than
-none — nearly every phishing site is behind Cloudflare, so "shared nameserver" would put
-every case in one bucket. Signals from shared infrastructure (Cloudflare, AWS, the big
-registrars' DNS) are discounted, and every link shows the evidence that drew it so you can
-throw it out. A group yields one combined registrar complaint: a pattern of abuse across
-several domains is far stronger than the same report filed separately.
+History группирует страницы, похожие на одного оператора. Наивная кластеризация была бы хуже,
+чем никакой: почти каждый фишинговый сайт за Cloudflare, поэтому «общий неймсервер» свалил бы
+все дела в одну кучу. Сигналы от общей инфраструктуры (Cloudflare, AWS, DNS больших регистраторов)
+обесцениваются, и каждая связь показывает своё доказательство, чтобы вы могли её отбросить.
+Группа даёт одну объединённую жалобу регистратору: паттерн злоупотребления по нескольким доменам
+несравнимо сильнее той же жалобы, поданной по одной.
 
-## Certificate transparency watch
+## Наблюдение за Certificate Transparency
 
-Every TLS certificate is published to public CT logs within minutes of issue, so a
-lookalike domain appears there while the scammer is still setting it up — before any SMS
-goes out. The Report tab watches crt.sh for the brands you list.
+Каждый TLS-сертификат публикуется в публичных CT-логах в течение минут после выпуска, поэтому
+домен-двойник появляется там, пока мошенник ещё его настраивает — до любой SMS. Вкладка Report
+следит за crt.sh по перечисленным вами брендам.
 
-Scoring is deliberately strict, because `%telegram%` matches thousands of harmless names.
-A bare keyword scores **zero**. Points come from phishing vocabulary sitting in the same
-DNS label as the brand (the strong signal), a throwaway TLD, hyphens and digits padding
-the brand, and free hosting. Three earlier versions of this scoring were thrown out:
+Оценка нарочно строгая: `%telegram%` матчит тысячи безобидных имён. Голое ключевое слово даёт
+**ноль**. Баллы приносят фишинговая лексика в том же DNS-лейбле, что и бренд (сильный сигнал),
+одноразовый TLD, дефисы и цифры вокруг бренда и бесплатный хостинг. Три предыдущие версии этой
+оценки были выброшены:
 
-- weighting free hosting heavily buried real hits under every legitimate Telegram bot on
-  `workers.dev`
-- treating `web`, `app` and `support` as phishing words matched every legitimate mini-app
-- scoring the whole certificate name let hyphens far from the brand inflate the score
-- issue age is **not** scored: nearly every row crt.sh returns is recent, so it added a
-  constant point to everything and just moved the scale
+- сильный вес бесплатного хостинга топил реальные попадания под каждым легитимным Telegram-ботом
+  на `workers.dev`
+- трактовка `web`, `app` и `support` как фишинговых слов матчила каждый легитимный мини-апп
+- оценка полного имени сертификата позволяла дефисам вдали от бренда накручивать балл
+- возраст выпуска **не оценивается**: почти каждая строка crt.sh свежая, так что это добавляло
+  константный балл всему и просто сдвигало шкалу
 
-Free-hosting tenants (`*.workers.dev`, `*.pages.dev`, `*.hosted.app`) report as the full
-hostname. An earlier version reduced them to a registrable domain and would have had you
-reporting `pages.dev` — Cloudflare's own domain — instead of the scammer. That fix landed
-in the core `registrable_domain`, so it applies to the whole tool, not just this watch.
+Арендаторы бесплатного хостинга (`*.workers.dev`, `*.pages.dev`, `*.hosted.app`) репортятся полным
+хостнеймом. Ранняя версия сворачивала их до регистрируемого домена — и вы бы жаловались на
+`pages.dev`, собственный домен Cloudflare, вместо мошенника. Исправление легло в ядро
+`registrable_domain`, так что действует на весь инструмент, а не только на этот монитор.
 
-crt.sh rate-limits and returns 502s often. A failed query is reported as a failed query,
-never as "nothing found".
+crt.sh часто ограничивает частоту и отдаёт 502. Неудавшийся запрос сообщается как неудавшийся
+запрос, а не «ничего не найдено».
 
-## Desktop notifications
+## Уведомления на рабочий стол
 
-macOS notifications when something actually changes: a site becomes blocked, gets picked up
-by blocklists, goes down, comes back up, or a new lookalike certificate appears. Also once,
-when a case's ICANN window closes and the complaint becomes fileable. No notification for
-"still the same" — only transitions worth interrupting you for.
+Уведомления macOS, когда реально что-то меняется: сайт заблокирован, попал в блок-листы, лёг,
+поднялся, или появился новый сертификат-двойник. И один раз — когда у дела закрывается окно ICANN
+и жалобу можно подавать. Никаких уведомлений «всё по-прежнему» — только переходы, ради которых
+стоит вас отвлекать.
 
-## Clipboard watch
+## Наблюдение за буфером обмена
 
-Toggle on the Report tab. Copy a link out of Messages and a chip appears with the target
-already parsed. Off by default and explicitly opt-in — it reads your clipboard while on.
-Only extracted URLs are kept; the clipboard text is never stored, logged, or sent anywhere.
+Переключатель на вкладке Report. Скопируйте ссылку из Messages — появляется чип с уже
+разобранной целью. По умолчанию выключено и включается явно — пока включено, читает ваш буфер
+обмена. Хранятся только извлечённые URL; текст буфера никогда не сохраняется, не логируется
+и никуда не отправляется.
 
-## Evidence
+## Доказательства
 
-When urlscan has a scan on file, its screenshot and report land in the case file
-automatically. That gives a registrar complaint a picture of the page without you ever
-loading it.
+Когда у urlscan есть скан этой страницы, его скриншот и отчёт автоматически попадают в файл
+дела. Это даёт жалобе регистратору картинку страницы, при том что вы её ни разу не загрузили.
 
-## ICANN escalation
+## Эскалация в ICANN
 
-Each case has an **ICANN escalation** button that assembles the complaint from what
-actually happened: when you first reported, when the registrar's abuse address was
-emailed, every blocklist and vendor confirmation, and the check-by-check timeline proving
-the domain stayed up.
+У каждого дела есть кнопка **ICANN escalation**, собирающая жалобу из того, что реально
+произошло: когда вы впервые пожаловались, когда abuse-адрес регистратора получил письмо,
+каждое подтверждение от блок-листов и вендоров и поминутная хронология проверок, доказывающая,
+что домен оставался жив.
 
-It refuses to pretend you are ready when you are not, and says exactly what is missing:
+Она отказывается притворяться, что вы готовы, когда вы не готовы, и говорит, чего именно не хватает:
 
-- the registrar was never emailed, or you have not ticked it as sent
-- the registrar's 24h window is still open
-- the domain is already suspended, so there is nothing to escalate
+- регистратору ни разу не писали, или вы не отметили письмо отправленным
+- 24-часовое окно регистратора ещё открыто
+- домен уже приостановлен — эскалировать нечего
 
-ICANN enforces the registrar's RAA 3.18 duty to investigate; without a documented,
-ignored report there is nothing for them to act on.
+ICANN принуждает регистратора исполнять обязанность разбираться по RAA 3.18; без
+задокументированного и проигнорированного отчёта реагировать не на что.
 
-## Evidence bundle
+## Пакет доказательств
 
-Each case has an **Evidence bundle** button that writes
+У каждого дела есть кнопка **Evidence bundle**, записывающая
 `reports/<host>/<host>-evidence-<timestamp>.zip`:
 
-| File | What it is |
+| Файл | Что это |
 |---|---|
-| `report.html` | printable summary — target, who was told and when, vendor outcomes, full timeline, current position |
-| `checks.csv` | every status check, machine readable, including whether the page itself was fetched |
-| `case.json` | complete raw record |
-| `screenshot.png` | the phishing page as urlscan captured it — you never loaded it |
-| `emails/*.eml` | the complaints sent to each abuse contact |
+| `report.html` | печатаемая сводка — цель, кто и когда был уведомлён, исходы у вендоров, полная хронология, текущее положение |
+| `checks.csv` | все проверки статуса, машиночитаемо, включая то, запрашивалась ли сама страница |
+| `case.json` | полный сырой файл дела |
+| `screenshot.png` | фишинговая страница, как её снял urlscan — вы её не загружали |
+| `emails/*.eml` | жалобы, отправленные каждому abuse-контакту |
 
-The report never presents *blocked* as *removed*: when the host is merely warning
-visitors it says so explicitly, because a registrar reading it needs to know the domain is
-still registered and resolving.
+Отчёт никогда не выдаёт *blocked* за *removed*: когда хост лишь предупреждает посетителей,
+это сказано явно, — регистратор, читающий его, должен знать, что домен всё ещё зарегистрирован
+и резолвится.
 
-Downloads are served only from `reports/`, only for `.zip` files, with path traversal
-rejected.
+Скачивания отдаются только из `reports/`, только файлы `.zip`, с отбрасыванием path traversal.
 
-## Local reporting channels
+## Локальные каналы жалоб
 
-Set your country in Settings and its national channels join every report. Malaysia is
-wired in, each entry recording how it was checked, because government portals move:
+Укажите страну в Settings, и её национальные каналы добавятся к каждой жалобе. Малайзия
+подключена, каждая запись хранит, как она проверялась, — государственные порталы мигрируют:
 
-| Channel | How | When |
+| Канал | Как | Когда |
 |---|---|---|
-| MyCERT Cyber999 — `mycert.org.my/cyber999` | web form + `cyber999@cybersecurity.my` | always — the national CERT, and it coordinates takedowns |
-| MCMC — `aduan.mcmc.gov.my` | web form | always, and it is the only channel for the spoofed SMS itself |
-| PDRM Semak Mule — `semakmule.rmp.gov.my` | web form | when the scam gave you an account or phone number |
-| NSRC — `997` | phone | **only if money was actually transferred** — call at once |
-| Cyber999 hotline — `1-300-88-2999` | phone | if you would rather talk than fill a form |
+| MyCERT Cyber999 — `mycert.org.my/cyber999` | веб-форма + `cyber999@cybersecurity.my` | всегда — национальный CERT, он координирует тейкдауны |
+| MCMC — `aduan.mcmc.gov.my` | веб-форма | всегда, и это единственный канал для самой подделанной SMS |
+| PDRM Semak Mule — `semakmule.rmp.gov.my` | веб-форма | если мошенник дал вам счёт или номер телефона |
+| NSRC — `997` | телефон | **только если деньги реально переведены** — звоните немедленно |
+| Горячая линия Cyber999 — `1-300-88-2999` | телефон | если проще поговорить, чем заполнять форму |
 
-Verified live: the MyCERT, MCMC and Semak Mule pages all return HTTP 200, and
-`cybersecurity.my` accepts mail. `aduan.skmm.gov.my` redirects to the MCMC portal.
-`nsrc.gov.my`, `ecrs.rmp.gov.my` and `aduan.cybersecurity.my` did **not** resolve, so
-they are deliberately not listed.
+Проверено вживую: страницы MyCERT, MCMC и Semak Mule отдают HTTP 200, `cybersecurity.my`
+принимает почту. `aduan.skmm.gov.my` перенаправляет на портал MCMC. `nsrc.gov.my`,
+`ecrs.rmp.gov.my` и `aduan.cybersecurity.my` **не** резолвятся, поэтому намеренно не перечислены.
 
-The CERT matters more than it looks: it can lean on a host and a registrar with standing
-an individual reporter does not have.
+CERT значимее, чем кажется: он может надавить на хост и регистратора с положением, которого
+у отдельного жалобщика нет.
 
-Adding another country means one entry in `channels.py` — nothing else is country-aware.
+Добавление другой страны — это одна запись в `channels.py`, остальной код о странах не знает.
 
-## Order of attack
+## Порядок удара
 
-1. **Cloudflare / the host first** if the site is proxied — they reach the real origin fastest.
-2. **Registrar** second (`complaint@...`), citing ICANN RAA 2013 §3.18.
-3. **ICANN last, and only after 24h of registrar silence.** ICANN is not a takedown channel; they enforce the registrar's duty to respond. The History tab is your evidence.
+1. **Сначала Cloudflare / хост**, если сайт за прокси — они быстрее всех добираются до реального источника.
+2. **Регистратор** второй (`complaint@...`), со ссылкой на ICANN RAA 2013 §3.18.
+3. **ICANN последним, и только после 24 ч молчания регистратора.** ICANN — не канал тейкдауна;
+   они принуждают регистратора отвечать. Вкладка History — ваши доказательства.
 
-## Files
+## Файлы
 
-- `server.py` — GUI + local API
-- `ui.html` — the interface
-- `reactor.py` — recon, blocklist APIs, complaint emails (also usable standalone: `python3 reactor.py <url> --send`)
-- `automate.py` — Playwright driver, field classifier
-- `sites.py` — the vendor list and what you must click on each
-- `reports/` — `.eml` drafts, `runs.jsonl`, `log.jsonl`
+- `server.py` — GUI + локальный API
+- `ui.html` — интерфейс
+- `reactor.py` — разведка, API блок-листов, письма-жалобы (также автономно: `python3 reactor.py <url> --send`)
+- `automate.py` — драйвер Playwright, классификатор полей
+- `sites.py` — список вендоров и что на каждом нужно нажимать
+- `reports/` — черновики `.eml`, `runs.jsonl`, `log.jsonl`
 
-Self-checks: `python3 reactor.py --selftest` and `python3 automate.py`.
+Самопроверки: `python3 reactor.py --selftest` и `python3 automate.py`.
